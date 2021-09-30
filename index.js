@@ -74,21 +74,20 @@ const [eqn, slider, soln] = figure.add([
       wf: ['whole', '  ', { frac: ['numerator', 'v', 'denominator'] }],
       f: { frac: ['numerator', 'v', 'denominator'] },
       wPortions: ['w', 'lots'],
-      wfPortions: ['wf', '  ', 'lots'],
-      fPortions: ['f', 'lots'],
+      wfPortions: ['wf', 'lots'],
       finalFrac: { frac: ['fNum', 'v1', 'fDen'] },
+      fPortions: ['f', 'lots'],
     },
     forms: {
       w1: { content: [{ bottomComment: { content: { container: { width: 1, content: '' } }, comment: 'wPortions', scale: 1, symbol: 'brace' } }], alignment: { yAlign: 'top' } },
       wf1: { bottomComment: { content: { container: { width: 1, content: '' }, alignment: { yAlign: 'top' }  }, comment: 'wfPortions', scale: 1, symbol: 'brace' } },
       f1: { bottomComment: { content: { container: { width: 1, content: '' }, alignment: { yAlign: 'top' }  }, comment: 'fPortions', scale: 1, symbol: 'brace' } },
-      w2: { content: ['equals', 'wPortions'], alignment: { xAlign: 'left' } },
-      wf2: { content: ['equals', 'wfPortions'], alignment: { xAlign: 'left' } },
-      f2: { content: ['equals', 'fPortions'], alignment: { xAlign: 'left' } },
-
-      w3: { content: ['equals', 'wPortions', 'equals2', 'finalFrac'], alignment: { xAlign: 'left' } },
-      wf3: { content: ['equals', 'wfPortions', 'equals2', 'finalFrac'], alignment: { xAlign: 'left' } },
-      f3: { content: ['equals', 'fPortions'], alignment: { xAlign: 'left' } },
+      w2: { content: ['equals', 'w'], alignment: { xAlign: 'left' } },
+      wf2: { content: ['equals', 'wf'], alignment: { xAlign: 'left' } },
+      f2: { content: ['equals', 'f'], alignment: { xAlign: 'left' } },
+      w3: { content: ['equals', 'w', 'equals2', 'finalFrac'], alignment: { xAlign: 'left' } },
+      wf3: { content: ['equals', 'wf', 'equals2', 'finalFrac'], alignment: { xAlign: 'left' } },
+      f3: { content: ['equals', 'f'], alignment: { xAlign: 'left' } },
       f3Final: { content: ['equals', 'f'], alignment: { xAlign: 'left' } },
       final: { content: ['equals', 'finalFrac'], alignment: { xAlign: 'left' } },
     },
@@ -279,7 +278,6 @@ button.notifications.add('onClick', () => {
       barsToShow.push(bars[i])
     }
   }
-  console.log(barsToShow)
   figure.animations.new()
     .then(eqn.animations.scenario({ target: 'left', duration: 2 }))
     // .then(eqn.animations.goToForm({ target: '1', animate: 'move', duration: 2 }))
@@ -295,6 +293,7 @@ button.notifications.add('onClick', () => {
         .dissolveOut(1)
         .start();
     })
+    .delay(0.5)
     .trigger({
       callback: () => {
         for (let i = 0; i < barsToShow.length; i += 1) {
@@ -353,9 +352,9 @@ button.notifications.add('onClick', () => {
             soln.animations.scenario({ target: 'final', duration: 3 }),
             eqn.animations.scenario({ target: 'final', duration: 3 }),
           ])
-          .delay(2)
+          .delay(1)
           .then(soln.animations.goToForm({ target: target2, animate: 'move', duration: 3 }))
-          .delay(2)
+          .delay(1)
           .then(soln.animations.goToForm({ target: target3, animate: 'move', duration: 3 }))
           .start();
       },

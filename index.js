@@ -14,7 +14,30 @@ const axis = figure.add({
   labels: { precision: 0 },
 
   font: { size: 0.07 },
-})
+});
+
+const toggle = figure.add({
+  make: 'collections.toggle',
+  label: {
+    text: 'Manual',
+    location: 'bottom',
+  },
+  theme: 'light',
+  position: [1.9, 1],
+});
+
+
+const button = figure.add({
+  make: 'collections.button',
+  width: 0.35,
+  height: 0.3,
+  corner: { radius: 0.05, sides: 20 },
+  label: 'Go',
+  touchBorder: 0.2,
+  position: [1.9, -0.9],
+  touchDown: { colorFill: [0.3, 0.3, 0.3, 1] },
+});
+
 
 const colorY = [1, 1, 0, 1];
 const colDim = [1, 1, 0, 1];
@@ -33,6 +56,8 @@ const [eqn, slider, soln] = figure.add([
       center: { position: [-0.5, 0], scale: 1.8 },
       left: { position: [-2, -0.9], scale: 1 },
       final: { position: [-0.8, -0.35], scale: 1 },
+      top: { position: [-0.3, 0.8], scale: 1 },
+      centerLeft: { position: [-2.2, 0.8], scale: 1.5 },
     },
     forms: {
       0: ['_1', 'div', { frac: ['numerator', 'v', 'denominator'] }],
@@ -127,7 +152,7 @@ const makeRect = (name, width, color, fill, position) => {
         xStep: 0.1,
         yStep: 1,
         line: {
-          dash: [0.02, 0.01],
+          dash: [0.03, 0.34],
           width: 0.003,
         },
         mods: {
@@ -197,7 +222,7 @@ const getFraction = () => {
   return fraction;
 }
 
-const setBars = () => {
+const setBars = (hideGrid = false) => {
   for (let i = 0; i < bars.length; i += 1) {
     const fraction = getFraction();
     bars[i].show();
@@ -211,9 +236,40 @@ const setBars = () => {
       bounds: [-fraction[0] / 2, -0.2, fraction[0], 0.4],
       xStep: fraction[0] / fraction[1],
     })
-    bars[i]._grid.hide();
+    if (hideGrid) {
+      bars[i]._grid.hide();
+    } else {
+      bars[i]._grid.show();
+    }
+    if (i > Math.floor(1 / fraction[0] - 0.00001)) {
+      bars[i].hide();
+    }
   }
 };
+
+const showManual = () => {
+  figure.stop();
+  setBars(false);
+  soln.hide();
+  bar.show();
+  bar._eqn.hide();
+  axis.show();
+  eqn.showForm('0');
+  eqn.setScenario('centerLeft');
+  button.hide();
+}
+
+const showAuto = () => {
+  figure.stop();
+  setBars();
+  axis.hide();
+  bar.hide();
+  hideBars();
+  soln.hide();
+  eqn.showForm('0');
+  eqn.setScenario('center');
+  button.show();
+}
 
 slider.notifications.add('changed', (value) => {
   const index = Math.floor(value / (1 / (fractions.length - 1)));
@@ -222,23 +278,16 @@ slider.notifications.add('changed', (value) => {
     numerator: `${fraction[1]}`,
     denominator: `${fraction[2]}`,
   }, 'all');
-  setBars();
-  eqn.setScenario('center');
-  hideBars();
-  eqn.showForm('0');
-  soln.hide();
+  if (toggle._custom.state) {
+    showManual();
+  } else {
+    showAuto();
+  }
 });
 slider.setValue(0.48);
 
-const button = figure.add({
-  make: 'collections.button',
-  width: 0.35,
-  height: 0.35,
-  corner: { radius: 0.175, sides: 20 },
-  label: 'Go',
-  touchBorder: 0.2,
-  position: [1.9, -0.9],
-});
+toggle.notifications.add('on', () => showManual());
+toggle.notifications.add('off', () => showAuto());
 
 const setSoln = () => {
   const fraction = getFraction();
@@ -360,5 +409,9 @@ button.notifications.add('onClick', () => {
       },
     })
     .start();
-})
+});
+
+
+
+
 figure.setScenarios('start');

@@ -38,7 +38,7 @@ const [eqn, slider, soln] = figure.add([
       0: ['_1', 'div', { frac: ['numerator', 'v', 'denominator'] }],
       1: ['_1', 'div', { frac: ['numerator', 'v', 'denominator'] }, 'equals'],
     },
-    formDefaults: { alignment: { xAlign: 'left', yAlign: 'middle' } },
+    formDefaults: { alignment: { xAlign: 'left', yAlign: 'baseline' } },
   },
   {
     make: 'collections.slider',
@@ -56,32 +56,43 @@ const [eqn, slider, soln] = figure.add([
       whole: '1',
       numerator: '2',
       denominator: '3',
-      fNum: { text: '1', color: colDim },
-      fDen: { text: '2', color: colDim },
+      fNum: { text: '1' },
+      fDen: { text: '2' },
       v: { symbol: 'vinculum', width: 0.005 },
-      v1: { symbol: 'vinculum', width: 0.005, color: colDim },
+      v1: { symbol: 'vinculum', width: 0.005 },
       equals: '  =    ',
+      equals2: '  =    ',
       brace: { symbol : 'brace', side: 'bottom', lineWidth: 0.01, color: [0.6, 0.6, 0.6, 1] },
       lots: { text: '  portions', color: colDim },
     },
     scenarios: {
-      center: { position: [-0.5, -0.15], scale: 1 },
+      center: { position: [-1, 0.1], scale: 1 },
       final: { position: [-0.3, -0.35], scale: 1 },
     },
     phrases: {
-      wPortions: ['whole', 'lots'],
-      wfPortions: ['whole', '  ', { frac: ['numerator', 'v', 'denominator'] }, '  ', 'lots'],
-      fPortions: [{ frac: ['numerator', 'v', 'denominator'] }, 'lots'],
+      w: 'whole',
+      wf: ['whole', '  ', { frac: ['numerator', 'v', 'denominator'] }],
+      f: { frac: ['numerator', 'v', 'denominator'] },
+      wPortions: ['w', 'lots'],
+      wfPortions: ['wf', '  ', 'lots'],
+      fPortions: ['f', 'lots'],
+      finalFrac: { frac: ['fNum', 'v1', 'fDen'] },
     },
     forms: {
-      0: { bottomComment: { content: { container: { width: 1, content: '' } }, comment: 'wPortions', scale: 1, symbol: 'brace' } },
-      1: { bottomComment: { content: { container: { width: 1, content: '' } }, comment: 'wfPortions', scale: 1, symbol: 'brace' } },
-      2: { bottomComment: { content: { container: { width: 1, content: '' } }, comment: 'fPortions', scale: 1, symbol: 'brace' } },
-      3: { content: ['equals', 'wPortions'], alignment: { xAlign: 'left' } },
-      4: { content: ['equals', 'wfPortions'], alignment: { xAlign: 'left' } },
-      5: { content: ['equals', 'fPortions'], alignment: { xAlign: 'left' } }
+      w1: { content: [{ bottomComment: { content: { container: { width: 1, content: '' } }, comment: 'wPortions', scale: 1, symbol: 'brace' } }], alignment: { yAlign: 'top' } },
+      wf1: { bottomComment: { content: { container: { width: 1, content: '' }, alignment: { yAlign: 'top' }  }, comment: 'wfPortions', scale: 1, symbol: 'brace' } },
+      f1: { bottomComment: { content: { container: { width: 1, content: '' }, alignment: { yAlign: 'top' }  }, comment: 'fPortions', scale: 1, symbol: 'brace' } },
+      w2: { content: ['equals', 'wPortions'], alignment: { xAlign: 'left' } },
+      wf2: { content: ['equals', 'wfPortions'], alignment: { xAlign: 'left' } },
+      f2: { content: ['equals', 'fPortions'], alignment: { xAlign: 'left' } },
+
+      w3: { content: ['equals', 'wPortions', 'equals2', 'finalFrac'], alignment: { xAlign: 'left' } },
+      wf3: { content: ['equals', 'wfPortions', 'equals2', 'finalFrac'], alignment: { xAlign: 'left' } },
+      f3: { content: ['equals', 'fPortions'], alignment: { xAlign: 'left' } },
+      f3Final: { content: ['equals', 'f'], alignment: { xAlign: 'left' } },
+      final: { content: ['equals', 'finalFrac'], alignment: { xAlign: 'left' } },
     },
-    formDefaults: { alignment: { xAlign: 'center', yAlign: 'middle' } },
+    formDefaults: { alignment: { xAlign: 'left', yAlign: 'baseline' } },
   },
 ]);
 
@@ -104,8 +115,6 @@ const fractions = [
   [8, 7], [8, 5],
   [9, 8], [9, 7], [9, 5],
 ].map(f => [f[0] / f[1], f[0], f[1]]).sort();
-
-// let fraction = fractions[0];
 
 const makeRect = (name, width, color, fill, position) => {
   return figure.add({
@@ -149,7 +158,7 @@ const makeRect = (name, width, color, fill, position) => {
           denominator: '3',
           v: { symbol: 'vinculum', width: 0.005 },
         },
-        forms: { 0: { frac: ['numerator', 'v', 'denominator'] }, 1: ' ' },
+        forms: { 0: { frac: ['numerator', 'v', 'denominator'] }, 1: '_1' },
         color: [1, 1, 1, 1],
         scale: 0.6,
         formDefaults: {
@@ -157,7 +166,7 @@ const makeRect = (name, width, color, fill, position) => {
         },
       },
     ],
-    move: true,
+    move: name === 'bar' ? false : true,
     position,
     scenarios: {
       lower: { position: [0, 0] },
@@ -238,20 +247,20 @@ const setSoln = () => {
   const f = Fig.round(1 / fraction[0], 1) % 1;
   soln.updateElementText(
     {
-      whole: `${Math.floor(1 / (fraction[1] / fraction[2]))}`,
+      whole: `${whole}`,
       numerator: `${fraction[2] % fraction[1]}`,
       denominator: `${fraction[1]}`,
-      fNum: `${fraction[1]}`,
-      fDen: `${fraction[2]}`,
+      fNum: `${fraction[2]}`,
+      fDen: `${fraction[1]}`,
     },
     'all',
   );
   if (whole > 0 && f !== 0) {
-    soln.showForm('1');
+    soln.showForm('wf1');
   } else if (whole > 0 && f == 0) {
-    soln.showForm('0');
+    soln.showForm('w1');
   } else {
-    soln.showForm('2');
+    soln.showForm('f1');
   }
 }
 
@@ -279,6 +288,13 @@ button.notifications.add('onClick', () => {
     .dissolveIn({ element: bar, duration: 1 })
     .delay(0.5)
     // .dissolveIn({ elements: barsToShow })
+    .trigger(() => {
+      bar._eqn.showForm('1');
+      bar._eqn.animations.new()
+        .delay(1)
+        .dissolveOut(1)
+        .start();
+    })
     .trigger({
       callback: () => {
         for (let i = 0; i < barsToShow.length; i += 1) {
@@ -286,13 +302,13 @@ button.notifications.add('onClick', () => {
           barsToShow[i].show();
           barsToShow[i].setOpacity(0);
           barsToShow[i].animations.new()
-            .delay(2.5 * i)
+            .delay(3 * i)
             .opacity({ target: 1, duration: 1 })
             .scenario({ target: 'upper', duration: 1.5 })
             .start();
         }
       },
-      duration: barsToShow.length * 2.5,
+      duration: barsToShow.length * 3,
     })
     .dissolveOut({ element: axis })
     .trigger({
@@ -319,18 +335,28 @@ button.notifications.add('onClick', () => {
       callback: () => {
         const whole = Math.floor(1 / (fraction[1] / fraction[2]));
         const f = Fig.round(1 / fraction[0], 1) % 1;
-        let target = '5';
+        let target = 'f2';
+        let target2 = 'f3';
+        let target3 = 'f3Final';
         if (whole > 0 && f !== 0) {
-          target = '4';
+          target = 'wf2';
+          target2 = 'wf3'
+          target3 = 'final';
         } else if (whole > 0 && f == 0) {
-          target = '3';
+          target = 'w2';
+          target2 = 'w3'
+          target3 = 'final';
         }
         figure.animations.new()
           .inParallel([
             soln.animations.goToForm({ target, animate: 'move', duration: 3 }),
             soln.animations.scenario({ target: 'final', duration: 3 }),
-            eqn.animations.scenario({ target: 'final', duration: 3 })
+            eqn.animations.scenario({ target: 'final', duration: 3 }),
           ])
+          .delay(2)
+          .then(soln.animations.goToForm({ target: target2, animate: 'move', duration: 3 }))
+          .delay(2)
+          .then(soln.animations.goToForm({ target: target3, animate: 'move', duration: 3 }))
           .start();
       },
     })
